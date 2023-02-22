@@ -38,8 +38,8 @@ do_action( 'woocommerce_before_shipping_calculator' ); ?>
 			</p>
 		<?php endif; ?>
 
-		<?php if ( apply_filters( 'woocommerce_shipping_calculator_enable_state', true ) ) : ?>
-			<p class="form-row form-row-wide sv_d-none" id="calc_shipping_state_field">
+		<?php //if ( apply_filters( 'woocommerce_shipping_calculator_enable_state', true ) ) : ?>
+			<p class="form-row form-row-wide" id="calc_shipping_state_field">
 				<?php
 				$current_cc = WC()->customer->get_shipping_country();
 				$current_r  = WC()->customer->get_shipping_state();
@@ -69,13 +69,13 @@ do_action( 'woocommerce_before_shipping_calculator' ); ?>
 				}
 				?>
 			</p>
-		<?php endif; ?>
+		<?php //endif; ?>
 
-		<?php if ( apply_filters( 'woocommerce_shipping_calculator_enable_city', true ) ) : ?>
-			<p class="form-row form-row-wide sv_d-none" id="calc_shipping_city_field">
+		<?php //if ( apply_filters( 'woocommerce_shipping_calculator_enable_city', true ) ) : ?>
+			<p class="form-row form-row-wide" id="calc_shipping_city_field">
 				<input type="text" class="input-text" value="<?php echo esc_attr( WC()->customer->get_shipping_city() ); ?>" placeholder="<?php esc_attr_e( 'City', 'woocommerce' ); ?>" name="calc_shipping_city" id="calc_shipping_city" />
 			</p>
-		<?php endif; ?>
+		<?php //endif; ?>
 
 		<?php if ( apply_filters( 'woocommerce_shipping_calculator_enable_postcode', true ) ) : ?>
 			<p class="form-row form-row-wide" id="calc_shipping_postcode_field">

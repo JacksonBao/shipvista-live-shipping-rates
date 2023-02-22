@@ -18,12 +18,12 @@
 
             <div class="sv_col-12 sv_col-md-5 sv_border-right sv_mb-3 sv_mb-md-0">
                 <ul class="sv_list-unstyled">
-                    <li>♦ <b>Ship instantly</b> <small>Access to a free online system used to process shipments instantly.</small></li>
-                    <li>♦ <b>Shipping label</b> <small>Generate carrier approved BOL and AWB shipping labels.</small></li>
-                    <li>♦ <b>LTL shipments</b> <small>Schedule LTL shipments from anywhere to anywhere in North America including Trans-Border.</small></li>
-                    <li>♦ <b>Shipment Tracking</b> <small>Claims processing and statement of account with invoice details.</small></li>
-                    <li>♦ <b>Real time</b> <small>Real time, user friendly access to very competitive LTL and courier rates.</small></li>
-                    <li>♦ <b>Save time and money</b> <small>Save your business time and money. Fast and efficient process.</small></li>
+                    <li>♦ <b>Live Shipping Cost Calculator for your store</b></li>
+                    <li>♦ <b>Multi-Carrier Shipping Rates</b></li>
+                    <li>♦ <b>Multi-Warehouse Real-Time Shipping Cost</b></li>
+                    <li>♦ <b>Compare Carrier Rates, and Transit Time</b></li>
+                    <li>♦ <b>Decrease abandoned carts</b></li>
+                    <li>♦ <b>Better customer experience</b></li>
                 </ul>
             </div>
 
@@ -33,7 +33,7 @@
                     <li>Quick Links</li>
                     <li>♦ <b><a target="_blank" href="https://shipvista.com/about">About Us</a></b></small></li>
                     <li>♦ <b><a target="_blank" href="https://shipvista.com/open-account-offer">Bonus Offers</a></b></small></li>
-                    <li>♦ <b><a target="_blank" href="https://shipvista.com/trackmyshipment">Track Shipment</a></b></small></li>
+                    <li>♦ <b><a target="_blank" href="https://shipvista.com/track-shipment">Track Shipment</a></b></small></li>
                     <li>♦ <b><a target="_blank" href="https://shipvista.com/contact">Contact Us</a></b></small></li>
                 </ul>
             </div>

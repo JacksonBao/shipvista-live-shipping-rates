@@ -6,12 +6,12 @@
  * Description: Display live shipping rates to customers on cart/checkout pages, print labels, and track orders with Shipvista's free live shipping rates plugin. Fully customizable to suit your every shipping needs. 
  * Author:  Shipvista
  * Author URI: http://www.shipvista.com
- * Version: 2.0.1
+ * Version: 3.0.8
  * Tags: shipping, delivery, logistics, woocomemrce, free shipping, live rates, canada post, shipvista
- * Requires at least: 5.0
- * Tested up to: 5.9
- * Stable tag: 2.0.0
- * Requires PHP: 7.2.0
+ * Requires at least: 5.0.0
+ * Tested up to: 6.0.1
+ * Stable tag: 3.0.8
+ * Requires PHP: 7.4.0
  * License: GPLv3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * woo:
@@ -27,7 +27,7 @@ define('SHIPVISTA__PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SHIPVISTA__PLUGIN_URL', plugin_dir_url(__FILE__));
 define('SHIPVISTA__PLUGIN_SITE', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
 define('SHIPVISTA__PLUGIN_FILE', __FILE__);
-define('SHIPVISTA__PLUGIN_VERSION', '1.0.0');
+define('SHIPVISTA__PLUGIN_VERSION', '3.0.2');
 define('SHIPVISTA__PLUGIN_SLUG', 'wc-settings');
 
 if (!defined('WPINC')) {
@@ -100,6 +100,18 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
 
 
+        function slsr_admin_notice_warn()
+        {
+          // check if there exits api tokens
+          $apiToken = $this->get_option('api_status_ok');
+          if ($apiToken != 'yes') {
+            echo '<div class="notice notice-error is-dismissible">
+            <p><b>Important:</b> Shipvista Live shipping rates not configure. Please connect your account to get live rates on cart and checkout pages for your customers. <a href="' . esc_url(get_admin_url(null, 'admin.php?page=wc-settings&tab=shipping&section=shipvista')) . '">Connect Account</a></p>
+            </div>';
+          }
+        }
+
+
         /**
          * Control admin options
          */
@@ -126,33 +138,33 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
 
           if ($this->enabled == 'yes') {
             // include get available shipping rates
-            if (isset($package['items']) && count($package['items']) > 0) {
-              $rateList = $this->getShippingRates($package);
-              $this->rateList = $rateList;
-              // include get available shipping rates
-              foreach ($rateList as $rateObject) {
-                // $rateObject['meta_data'] = ['tosam' => 'Yes', 'How' => 'Yes'];
-                unset($rateObject['rate']);
-                unset($rateObject['free']);
-                unset($rateObject['transit']);
-                unset($rateObject['realRate']);
-                $this->SLSR_pluginLogs('rateList_new', json_encode($rateObject));
-                $this->add_rate($rateObject);
-              }
+            // if (isset($package['items']) && count($package['items']) > 0) {
+            $rateList = $this->getShippingRates($package);
+            $this->rateList = $rateList;
+            // include get available shipping rates
+            foreach ($rateList as $rateObject) {
+              // $rateObject['meta_data'] = ['tosam' => 'Yes', 'How' => 'Yes'];
+              unset($rateObject['rate']);
+              unset($rateObject['free']);
+              unset($rateObject['transit']);
+              unset($rateObject['realRate']);
+              $this->SLSR_pluginLogs('rateList_new', json_encode($rateObject));
+              $this->add_rate($rateObject);
+            }
 
-              global $post;
-              global $wp;
-              // get the post type
-              if (is_object($post) && $post->post_type == 'page') {
-                if ($post->post_name == 'checkout' && !isset($wp->query_vars['order-pay'])) {
-                  if (count($rateList) < 2) {
-                    wc_add_notice('Enter a valid shipping postal code to proceed', 'error');
-                    return false;
-                  }
+            global $post;
+            global $wp;
+            // get the post type
+            if (is_object($post) && $post->post_type == 'page') {
+              if ($post->post_name == 'checkout' && !isset($wp->query_vars['order-pay'])) {
+                if (count($rateList) < 2) {
+                  wc_add_notice('Enter a valid shipping postal code to proceed', 'error');
+                  return false;
                 }
               }
             }
           }
+          //   }
         }
       }
     }
@@ -167,6 +179,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
   }
 
   add_filter('woocommerce_shipping_methods', 'add_Shipvista');
+  //Disable city field on the WooCommerce cart shipping calculator
+
+  // add_filter('woocommerce_shipping_calculator_enable_state', '__return_false');
 
   function shipvista_validate_order($posted)
   {
@@ -340,9 +355,12 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
     global $post;
     if (isset($_GET['section']) && $_GET['section'] == 'shipvista' || (isset($post->post_type) && $post->post_type == 'shop_order')) {
       wp_enqueue_style('shipvista_plugin_styles', plugins_url('assets/css/shipvista_admin_style.css', __FILE__));
+      wp_enqueue_style('shipvista_plugin_selectize_styles', plugins_url('assets/css/selectize.css', __FILE__));
       wp_enqueue_style('shipvista_plugin_stylesw', 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css');
       wp_enqueue_style('shipvista_plugin_styles_full', plugins_url('assets/css/shipvista_style.css', __FILE__));
       wp_enqueue_script('shipvista_plugin_scripts2', plugins_url('assets/js/shipvista_admin_panel.js', __FILE__));
+      wp_enqueue_script('shipvista_plugin_scripts_selectize', plugins_url('assets/js/selectize.js', __FILE__));
+      wp_enqueue_script('shipvista_plugin_scripts_microplugin', plugins_url('assets/js/microplugin.js', __FILE__));
     }
     if (isset($post->post_type) && $post->post_type == 'shop_order') {
       wp_enqueue_style('shipvista_plugin_styles_front', plugins_url('assets/css/shipvista_style.css', __FILE__));
@@ -739,6 +757,23 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
   add_action('woocommerce_update_order', 'shipvista_update_order', 10);
 }
 
+add_action('http_api_curl', 'add_curl_timeout', 100, 1);
+function add_curl_timeout($handle) //called on line 1315
+{
+  curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 30);
+  curl_setopt($handle, CURLOPT_TIMEOUT, 30);
+}
+
+function svlr_delete_plugin()
+{
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'options';
+  $sql = "DELETE FROM $table_name WHERE option_name LIKE '%shipvista%' ";
+  $wpdb->query($sql);
+}
+
+register_uninstall_hook(__FILE__, 'svlr_delete_plugin');
+
 add_filter('woocommerce_locate_template', 'woo_adon_plugin_template', 1, 3);
 function woo_adon_plugin_template($template, $template_name, $template_path)
 {
@@ -770,3 +805,43 @@ function woo_adon_plugin_template($template, $template_name, $template_path)
 
   return $template;
 }
+
+
+
+
+// HANDLE POST REQUESTS
+function shipvistaPostHandler()
+{
+  // handle post requests
+  if (isset($_POST['shipvista_post_request'])) {
+    header('content-type: application/json');
+    $request = sanitize_text_field($_POST['shipvista_post_request']);
+    $response = ['status' => false, 'message' => []];
+    if ($request == 'getStates' && isset($_POST['country'])) {
+      $country = preg_replace('#[^a-zA-Z]#', '', $_POST['country']);
+      if (strlen($country) == 2) {
+        $countryObject = new WC_Countries();
+        $states = $countryObject->get_states($country);
+        $response['status'] = true;
+        $response['states'] = $states;
+      } else {
+        $response['message'] = 'Invalid country';
+      }
+    } else {
+      $response['message'] = '';
+    }
+
+    echo json_encode($response);
+    exit;
+  }
+}
+add_action('init', 'shipvistaPostHandler');
+
+function slsr_admin_notice_warn()
+{
+  SLSR_Shipvista();
+  $s = new SLSR_Shipvista();
+  $s->slsr_admin_notice_warn();
+}
+
+add_action("admin_notices", "slsr_admin_notice_warn");

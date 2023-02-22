@@ -84,14 +84,9 @@ class SLSR_WcShipvistaBootstrap extends SLSR_Shipvista
             }
             $address = @$userRequest['address'] ?: [];
 
-            if (empty($this->get_option('shipvista_origin_postcode')) && isset($address['postalCode'])) {
-                $this->update_option('shipvista_origin_postcode', $address['postalCode']);
-                $this->update_option('shipvista_origin_address_2', $address['streetAddress2']);
-                $this->update_option('shipvista_origin_address', $address['streetAddress']);
-                $this->update_option('shipvista_origin_phone_number', $address['phone']);
-            }
+            
 
-            $this->content['postcode'] = $this->get_option('shipvista_origin_postcode');
+            $this->content['postcode'] = $this->getShipFromAddress([]);
             $this->content['user']['name'] = $this->get_option('shipvista_user_name');
             $this->content['user']['avatar'] = $this->get_option('shipvista_user_avatar');
             $this->content['user']['email'] = $this->get_option('shipvista_user_email');
@@ -128,10 +123,10 @@ class SLSR_WcShipvistaBootstrap extends SLSR_Shipvista
         $this->wooCountry = $split_country;
         // Country and state separated:
         $carriers = json_decode(file_get_contents(SHIPVISTA__PLUGIN_DIR . 'assets/config/carriers.json'), true);
-
         $this->carrier_settings['CanadaPost'] = (array) @json_decode($this->get_option('CanadaPost')) ?: [];
         $this->carrier_settings['UPS'] = (array) @json_decode($this->get_option('UPS')) ?: [];
-        $merge = array_merge($this->carrier_settings['CanadaPost'], $this->carrier_settings['UPS']);
+        $this->carrier_settings['CANPAR'] = (array) @json_decode($this->get_option('CANPAR')) ?: [];
+        $merge = array_merge($this->carrier_settings['CanadaPost'], $this->carrier_settings['UPS'], $this->carrier_settings['CANPAR']);
         foreach ($carriers as $key => $carrier) {
             foreach($carrier as $k => $item){
                 $carriers[$key][$k]['checked']  = false;
@@ -169,6 +164,7 @@ class SLSR_WcShipvistaBootstrap extends SLSR_Shipvista
         // get tap
         $this->settingTabs = isset($_GET['wcs_setting']) ? sanitize_text_field($_GET['wcs_setting']) : 'basic';
         $this->content['Form'] = '';
+        $this->content['storeLocation'] = $this->getShipFromAddress([]);
         $this->render('settings.php');
     }
 }

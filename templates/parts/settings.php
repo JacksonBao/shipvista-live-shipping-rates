@@ -11,13 +11,16 @@
                         <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'basic' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=basic') ?>">Basic</a>
                     </li>
                     <li class="sv_nav-item sv_border-right sv_m-0  <?php echo ($this->settingTabs == 'shipper' ? 'sv_active sv_bg-dark  sv_text-white' : '') ?>">
-                        <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'shipper' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=shipper') ?>">Shipper Settings</a>
+                        <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'shipper' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=shipper') ?>">Warehouse Locations</a>
                     </li>
                     <li class="sv_nav-item sv_border-right  sv_m-0 <?php echo ($this->settingTabs == 'dimension' ? 'sv_active sv_bg-dark  sv_text-white' : '') ?>">
                         <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'dimension' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=dimension') ?>">Dimension </a>
                     </li>
                     <li class="sv_nav-item sv_border-right sv_m-0 <?php echo ($this->settingTabs == 'restrict' ? 'sv_active sv_bg-dark sv_text-white' : '') ?>">
                         <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'restrict' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=restrict') ?>">Restrictions </a>
+                    </li>
+                    <li class="sv_nav-item sv_border-right sv_m-0 <?php echo ($this->settingTabs == 'custom' ? 'sv_active sv_bg-dark sv_text-white' : '') ?>">
+                        <a class="sv_nav-link <?php echo  esc_attr(($this->settingTabs == 'custom' ? 'sv_text-white' : 'sv_text-dark')) ?>" href="<?php echo  esc_attr($this->pageLink . '&wcs_page=settings&wcs_setting=custom') ?>">Custom Shipping </a>
                     </li>
 
                     <li class="sv_nav-item  sv_m-0 <?php echo  esc_attr(($this->settingTabs == 'apis' ? 'sv_active sv_bg-dark  sv_text-white' : '')) ?>">
@@ -34,7 +37,7 @@
     <div class=" sv_table-responsive sv_mt-0">
 
         <table class="sv_table sv_border-0">
-            <thead class="sv_border-0">
+            <thead class="sv_border-0 shipping-header">
                 <tr class="sv_bg-dark sv_border-0 sv_text-white">
                     <th>#</th>
                     <th>Values</th>
@@ -79,7 +82,7 @@
                             <small><b>All postal codes beginning with that set in here will be restricted. E.g. You can put one or more letters to restrict all postal codes beginning with that letter. </b></small>
                         </td>
                         <td>
-                            <textarea class="sv_form-control" class="custom-control-input" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_restricted_locations" cols="20" rows="15" style="min-width: 300px;min-height:200px" placeholder="Enter locations" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_restricted_locations"><?php echo  esc_attr($this->get_option('shipvista_restricted_locations')); ?></textarea>
+                            <textarea class="sv_form-control" class="custom-control-input" id="<?php echo  ($this->fieldPrepend) ?>shipvista_restricted_locations" cols="20" rows="15" style="min-width: 300px;min-height:200px" placeholder="Enter locations" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_restricted_locations"><?php echo  esc_attr($this->get_option('shipvista_restricted_locations')); ?></textarea>
                         </td>
                     </tr>
 
@@ -95,106 +98,513 @@
                     </tr>
                 </tfoot>
 
+            <?php } elseif ($this->settingTabs == 'custom') { ?>
+                <style>
+                    .shipping-header {
+                        display: none !important;
+                    }
+                </style>
+
+                <!-- shipper setting -->
+                <tbody>
+                    <tr class="">
+                        <td colspan="2">
+                            <div class="float-right" id="action-button">
+                                <button class="btn btn-dark btn-sm d-none" type="button" onclick="toggleAddressForm(true)">Add Shipping method</button>
+                            </div>
+                            <h4>Custom Shipping</h4>
+                            <p>Setup custom shipping method to use in addition to live rates from. By default all flat rates are only applied as fallback rate.</p>
+                        </td>
+                    </tr>
+
+
+                    <tr class="_form_element">
+                        <td colspan="2" class="p-0">
+                            <div class="container mb-3 p-0 pt-2">
+                                <div class="d-flex flex-wrap">
+                                    <div class="col-12 col-md-6 m-0 ">
+                                        <div class="mb-3">
+                                            <h6>Shipping Method</h6>
+                                        </div>
+                                        <div class="py-1 mb-3">
+                                            <select name="shipping_method" style="max-width: 100% !important;" class="custom-select" id="shipping_method">
+                                                <option value="_flat">Flat Rate</option>
+                                                <option value="_free">Free Shipping</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="">Display Name</label>
+                                            <input type="text" id="_display_name" value="" class="form-control" placeholder="Enter shipping display name.">
+                                        </div>
+
+                                        <!-- flat rate options -->
+                                        <div class="_shippingMethods" id="_flat">
+                                            <div class="mb-3">
+
+                                                <div class="custom-control custom-switch float-right">
+                                                    <input type="checkbox" checked class="custom-control-input" id="_only_fallback">
+                                                    <label class="custom-control-label" for="_only_fallback"></label>
+                                                </div>
+                                                Only Fallback <?php echo wc_help_tip("Disable this option to allow flat rates to display with rates obtain from shipping carriers."); ?>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="">Cost</label>
+                                                <input type="number" id="_shipping_method_cost" class="form-control" placeholder="Enter cost">
+                                            </div>
+                                        </div>
+                                        <!-- flat rate options -->
+
+                                        <!-- free shipping method -->
+                                        <div class="_shippingMethods sv_d-none" id="_free">
+                                            <div class="py-1 mb-3">
+                                                <label value="Free">Free Shipping requires</label>
+
+                                                <select name="free_shipping_require" style="max-width: 100% !important;" class="custom-select" id="free_shipping_require">
+                                                    <option value="minimum_order_amount">Minimum order amount</option>
+                                                </select>
+                                            </div>
+
+
+                                            <div class="mb-3">
+                                                <label for="">Cost</label>
+                                                <input type="number" id="_free_shipping_method_cost" min="1" class="form-control" placeholder="Enter cost">
+                                            </div>
+                                        </div>
+                                        <!-- free shipping method -->
+
+                                        <div class="mb-3">
+                                            <label for="">Delivery Days</label>
+                                            <input type="number" id="_shipping_method_days" min="1" class="form-control" placeholder="Enter expected delivery days">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <button class="btn btn-block btn-dark" type="button" onclick="addShippingMethod()">Add Shipping Method</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 border-left">
+                                        <div class="mb-3">
+                                            <h6>
+                                                Custom Rates
+                                            </h6>
+                                        </div>
+
+                                        <div class="py-3 d-flex flex-wrap">
+                                            <?php $methods = $this->get_option('shipvista_custom_shipping_method') ?: '[]';
+                                            $content = json_decode($methods, true);
+                                            if (count($content) > 0) {
+
+                                                foreach ($content as $key => $value) { ?>
+                                                    <div class="col-12 py-2 <?php echo $key != 0 ? 'border-top' : ''; ?>">
+                                                        <div class="row">
+                                                            <div class="col-4">
+                                                                <?php echo $value['displayName'] ?>
+                                                            </div>
+                                                            <div class="col-8">
+                                                                <div class="float-right"><i class="dashicons dashicons-trash" style="cursor:pointer" onclick="removeShippingMethod(<?php echo $key; ?>)"></i></div>
+                                                                Cost: <?php echo $value['cost'] ?> <br>
+                                                                Days: <?php echo $value['deliveryDays'] ?>
+                                                                <?php if (isset($value['requires'])) {
+                                                                    echo '<br>' . "Requires: $value[requires]";
+                                                                } ?>
+                                                                <?php if (isset($value['type']) && $value['type'] == 'flat') {
+                                                                    echo '<br>' . "Fallback Only: " . ($value['fallback'] ? "Yes" : "No");
+                                                                } ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                <?php } ?>
+
+                                            <?php } else { ?>
+                                                <div class="flex-fill">
+                                                    <div class="jumbotron">
+                                                        <p class="lead">No custom shipping method available</p>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <input type="hidden" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_custom_shipping_method" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_custom_shipping_method" value='<?php echo $this->get_option('shipvista_custom_shipping_method') ?>' />
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+
+
+                </tbody>
+
             <?php } elseif ($this->settingTabs == 'shipper') { ?>
+                <style>
+                    .shipping-header {
+                        display: none !important;
+                    }
+                </style>
+
 
 
                 <!-- shipper setting -->
                 <tbody>
-
-                    <tr>
+                    <tr class="">
                         <td colspan="2">
-                            <h4>Shippers Settings</h4>
-                            <p>Use this option to set your ship from location.</p>
+                            <div class="float-right" id="action-button">
+                                <button class="btn btn-primary" type="button" onclick="toggleAddressForm(true)">Add Location</button>
+                            </div>
+                            <h4>Warehouses</h4>
+                            <p>Use this option to set your ship from locations. You store address will be used as default warehouse location.</p>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Origin Country Code* <br>
-                            <small>Shipping from country code. Country code must be 2 characters long e.g. US, CA...</small>
-                        </td>
-                        <td>
-                            <input type="text" required minlength="2" maxlength="2" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_country" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_country" value="<?php echo  esc_attr($this->get_option('shipvista_origin_country') ??  $this->wooCountry[0]  ?? 'US') ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Origin State* <br>
-                            <small>Shipping from State Code. State Code must be 2 characters long.</small>
-                        </td>
-                        <td>
-                            <input type="text" required minlength="2" minlength="2" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_state" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_state" value="<?php echo  esc_attr($this->get_option('shipvista_origin_state') ??  @$this->wooCountry[1] ?? '')  ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Origin City* <br>
-                            <small>Enter full Shipping from city name.</small>
-                        </td>
-                        <td>
-                            <input type="text" required id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_city" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_city" value="<?php echo  esc_attr($this->get_option('shipvista_origin_city')  ?? $this->get_option('woocommerce_store_city'))  ?>" class="sv_form-control" />
+
+                    <tr class="_form_element d-none">
+                        <td colspan="2" class="p-0">
+                            <div class="container mb-3 p-0 pt-2">
+                                <div class="d-flex flex-wrap">
+                                    <div class="col-12 col-md-6 m-0 ">
+
+                                        <div class="mb-3">
+                                            <h5>Warehouse Location</h5>
+                                        </div>
+
+                                        <!-- set from location -->
+                                        <div class="mb-3">
+                                            <div class="sv_float-right"><?php echo wc_help_tip("Enter nick name for address."); ?> </div>
+                                            <label for="">Nick Name</label>
+                                            <input type="text" class="form-control" id="_nickname" name="_nickname" />
+                                        </div>
+                                        <!-- set from location -->
+
+                                        <div class="mb-3">
+                                            <?php
+                                            global $woocommerce;
+                                            $countries_obj   = new WC_Countries();
+                                            $countries   = $countries_obj->__get('countries');
+                                            // $current_cc = WC()->customer->get_shipping_country();
+                                            // $current_r  = WC()->customer->get_shipping_state();
+                                            // $states     = WC()->countries->get_states( $current_cc );
+                                            // die(var_dump($countries_obj->get_shipping_countries(), 'ddddd'));
+
+                                            ?>
+                                            <div class="sv_float-right"> <?php echo wc_help_tip("Select a valid country."); ?> </div>
+                                            <label for="">Country</label>
+                                            <select name="from_country" id="from_country" class="form-control custom-select" style="max-width: 100% !important;">
+                                                <option value=""> Select Country</option>
+                                                <?php
+                                                foreach ($countries_obj->get_shipping_countries() as $key => $value) {
+                                                    echo '<option value="' . esc_attr($key) . '">' . esc_html($value) . '</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="sv_float-right"> <?php echo wc_help_tip("Select a valid ship from state."); ?> </div>
+                                            <label for="">State</label>
+                                            <select name="from_state" disabled id="from_state" class="form-control custom-select" style="max-width: 100% !important;">
+                                                <option>Selecte State</option>
+                                            </select>
+                                            <!-- <input type="text" minlength="2" maxlength="2" class="form-control" id="from_state" placeholder="State"> -->
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="sv_float-right"><?php echo wc_help_tip("Select a valid zip/postal code."); ?></div>
+                                            <label for="">Zip Code </label>
+                                            <input type="text" minlength="4" class="form-control" id="from_zip_code" placeholder="Zip Code">
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 border-left">
+                                        <div class="mb-3">
+                                            <h5>
+                                                Delivery locations
+                                            </h5>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="">Countries</label><br>
+                                            <select name="to_country" multiple id="to_country" style="width: 100% !important;height: 35px;">
+                                                <option value=""> Select Country</option>
+                                                <?php
+                                                foreach ($countries_obj->get_shipping_countries() as $key => $value) {
+                                                    echo '<option value="' . esc_attr($key) . '">' . esc_html($value) . '</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="sv_float-right"><?php echo wc_help_tip("Select states you will ship to using the from address. Leaving this option blank will mean shipping to the entire selected countries above."); ?></div>
+                                            <label for="">States </label><br>
+                                            <select name="to_state" multiple id="to_state" style="width: 100% !important;height: 35px;">
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="sv_float-right"><?php echo wc_help_tip("Enter comma seperated postal or zip code, you'd ship to using the from address."); ?></div>
+                                            <label for="">Zip Codes </label>
+                                            <input type="text" class="form-control" id="to_zip_codes" placeholder="Delivery Zip Codes">
+                                        </div>
+
+                                    </div>
+
+
+                                    <input type="hidden" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_address_book" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_address_book" value='<?php echo $this->get_option('shipvista_address_book') ?>' />
+                                </div>
+                            </div>
+
                         </td>
                     </tr>
 
 
-                    <tr>
-                        <td>Origin Postal/Zip Code* <br>
-                            <small>Shipping from postal/zip code.</small>
-                        </td>
-                        <td>
-                            <input type="text" required id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_postcode" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_postcode" value="<?php echo  esc_attr($this->get_option('shipvista_origin_postcode') ?? $this->get_option('woocommerce_store_postcode')) ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Origin Address <br>
-                            <small>Shipping address (Shipping from address).</small>
-                        </td>
-                        <td>
-                            <input type="text" required minlength="3" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_address" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_address" value="<?php echo  esc_attr($this->get_option('shipvista_origin_address') ?? $this->get_option('woocommerce_store_address')) ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
+                    <tr class="_form_element destination_list">
+                        <td colspan="2">
+                            <div class="container">
+                                <div class="d-flex flex-wrap w-100">
+                                    <?php
+                                    $destinations = [];
 
-                    <tr>
-                        <td>Origin Address line 2<br>
-                            <small>Shipping address line 2.</small>
-                        </td>
-                        <td>
-                            <input type="text" minlength="3" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_address_2" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_address_2" value="<?php echo  esc_attr($this->get_option('shipvista_origin_address_2') ??  $this->get_option('woocommerce_store_address_2')) ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Email Address<br>
-                            <small>Shipping address (Shipping from address).</small>
-                        </td>
-                        <td>
-                            <input type="text" required minlength="5" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_user_email" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_user_email" value="<?php echo  esc_attr(($this->get_option('shipvista_user_email') ??  $this->get_option('woocommerce_store_email_address'))) ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
+                                    if ($this->settingTabs == 'shipper') {
+                                        $settings = $this->get_option('shipvista_address_book');
+                                        $destinations = $settings ? json_decode($settings, true) : [];
+                                        // set default location
+                                        array_unshift($destinations, [
+                                            'nickname' => 'Default Ship from location',
+                                            'from_address' => ['country' => $this->content['storeLocation']['countryCode'], 'state' => $this->content['storeLocation']['stateCode'], 'zip_code' => $this->content['storeLocation']['postalCode']],
+                                            'to_address' => ['country' => '', 'state' => '', 'zip_code' => ''],
+                                        ]);
+                                        // die(var_dump($destinations));
+                                    }
+                                    if (count($destinations) > 0) {
+                                        foreach ($destinations as $id => $destination) { ?>
+                                            <div class="col-12 mb-3 border" id="address_<?php echo $id; ?>">
+                                                <div class="">
+                                                    <div class="card-body d-flex flex-wrap">
+                                                        <div class="col-<?php echo ($id == 0 ? '12' : '4') ?> align-self-center mb-3">
+                                                            <b><?php echo (isset($destination['nickname']) && strlen($destination['nickname']) > 0 ? $destination['nickname'] : 'Address ' . ($id )) ?></b>
+                                                        </div>
+                                                        <?php if ($id != 0) { ?>
+                                                            <div class="col-8 align-self-center mb-3">
+                                                                <div class="d-flex justify-content-end">
+                                                                    <div class="px-2">
+                                                                        <span class="" style="cursor: pointer;" data-content='<?php echo json_encode($destination); ?>' onclick="editLocation(<?php echo $id; ?>)" id="_address_<?php echo $id; ?>">Edit</span>
+                                                                    </div>
+                                                                    <div class="px-2">
+                                                                        <span class="" style="cursor: pointer;" onclick="cloneLocation(<?php echo $id; ?>)">Clone</span>
+                                                                    </div>
+                                                                    <div class="px-2">
+                                                                        <span class="sv_text-danger" style="cursor: pointer;" onclick="deleteLocation(<?php echo $id; ?>)">Delete</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php } ?>
 
-                    <tr>
-                        <td>Origin Phone Number <br>
-                            <small>Your store contact phone number.</small>
-                        </td>
-                        <td>
-                            <input type="tel" minlength="7" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_phone_number" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_origin_phone_number" value="<?php echo  esc_attr($this->get_option('shipvista_origin_phone_number')) ?>" class="sv_form-control" />
-                        </td>
-                    </tr>
+                                                        <div class="col-12 col-md-4">
+                                                            <div class="mb-2"><small>Warehouse Address</small></div>
+                                                            <div class="mb-2">
+                                                                <div class="d-flex">
+                                                                    <div class="flex-fill">
+                                                                        <small>Country</small> <br>
+                                                                        <b><?php echo $destination['from_address']['country']; ?></b>
+                                                                    </div>
 
-                    <tr>
-                        <td>Currency*<br>
-                            <small>Which currency should shipping cost be returned in to you.</small>
-                        </td>
-                        <td>
-                            <input type="text" minlength="3" maxlength="3" id="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_user_currency" name="<?php echo  esc_attr($this->fieldPrepend) ?>shipvista_user_currency" value="<?php echo  esc_attr($this->get_option('shipvista_user_currency') ?: $this->get_option('woocommerce_currency')) ?>" class="sv_form-control" />
+                                                                    <div class="flex-fill">
+                                                                        <small>State</small> <br>
+                                                                        <b><?php echo $destination['from_address']['state']; ?></b>
+                                                                    </div>
+
+                                                                    <div class="flex-fill">
+                                                                        <small>Zip Code</small> <br>
+                                                                        <b><?php echo $destination['from_address']['zip_code']; ?></b>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-md-8 border-left">
+                                                            <div class="mb-2"><small>Delivery Locations</small></div>
+                                                            <div class="mb-2">
+                                                                <div class="d-flex">
+                                                                    <div class="flex-fill">
+                                                                        <small>Countries</small> <br>
+                                                                        <span><?php echo is_array($destination['to_address']['country']) ? implode(', ', $destination['to_address']['country']) : ($destination['to_address']['country'] ? $destination['to_address']['country'] : '<small>ALL COUNTRIES</small>'); ?></span>
+                                                                    </div>
+
+                                                                    <div class="flex-fill" title="<?php echo str_replace(['"', '[', ']', '{', '}'], '', json_encode($destination['to_address']['state'])); ?>" style="width: 50px;
+                                                                        white-space: nowrap;
+                                                                        overflow: hidden;
+                                                                        text-overflow: ellipsis;">
+                                                                        <small>States</small> <br>
+                                                                        <span><?php echo str_replace(['"', '[', ']', '{', '}'], '', json_encode($destination['to_address']['state'])) ?: '<small>ALL STATES</small>'; ?></span>
+                                                                    </div>
+
+                                                                    <div class="flex-fill" style="width: 50px;
+                                                                        white-space: nowrap;
+                                                                        overflow: hidden;
+                                                                        text-overflow: ellipsis;">
+                                                                        <small>Zip Codes</small> <br>
+                                                                        <span><?php echo $destination['to_address']['zip_code'] ?: '<small>ALL ZIP CODES</small>'; ?></span>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php }
+                                    } else { ?>
+                                        <div class="col-12">
+                                            <div class="jumbotron">
+                                                <div class="py-5  text-center">
+                                                    <h3 class="display">No address in address book</h3>
+                                                    <p>You currently do not have any warehouse locations. Your default store address will be used to get rates. </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
                         </td>
                     </tr>
 
                 </tbody>
-                <tfoot>
+                <tfoot class="_form_element addressButton d-none">
                     <tr>
                         <td colspan="2">
                             <div class="sv_text-center sv_3">
-                                <button type="button" onclick="sv_WooSave()" class="sv_btn sv_btn-primary"> Save Settings</button>
+                                <button type="button" onclick="sv_saveAddressBook()" class="sv_btn sv_btn-primary"> Save
+                                    Address</button>
                             </div>
                         </td>
                     </tr>
                 </tfoot>
+
+                <script type="module">
+                    var countryObject = <?php echo json_encode($countries_obj->get_shipping_countries()); ?>;
+                    window.addEventListener('load', evt => {
+                        // jQuery(function() {
+                        var totalElements = [];
+                        jQuery("#to_country").selectize({
+                            maxItems: <?php echo count($countries_obj->get_shipping_countries()) ?>,
+                            onChange: function(countries) {
+                                changeToCountry(countries);
+                            },
+                            onItemRemove: function(stateCode) {
+                                var $select = jQuery('#to_state').selectize();
+                                var selectize = $select[0].selectize;
+                                if (document.querySelector('#_country_' + stateCode).getAttribute('data-group-id')) {
+                                    var id = document.querySelector('#_country_' + stateCode).getAttribute('data-group-id');
+                                    // remove items
+                                    console.log(totalElements);
+                                    for (const [key, value] of Object.entries(totalElements)) {
+                                        if (key == stateCode) {
+                                            value.map(element => {
+                                                if (element.groupLabel == id) {
+                                                    selectize.removeItem(element.value, true);
+                                                    selectize.removeOption(element.value, true)
+                                                }
+                                            })
+                                        }
+                                    }
+                                    selectize.removeOptionGroup(id);
+                                    selectize.refreshItems();
+                                    selectize.refreshOptions();
+                                }
+
+
+                            },
+                        });
+                        // });
+
+                        let countryList = [];
+
+                        async function changeToCountry(countries) {
+
+                            // var countries = jQuery('#to_country').val(); //e.target.value;
+
+                            // check if a state was added or removed
+                            let difference = countries.filter(x => !countryList.includes(x));
+
+                            var listTotal = 0;
+                            if (difference.length > 0) {
+                                var optionList = [];
+                                var optionGroup = [];
+
+                                await difference.forEach(country => {
+                                    // load country states
+                                    jQuery.post(
+                                        window.location, {
+                                            'shipvista_post_request': 'getStates',
+                                            country,
+                                        },
+                                        (response) => {
+                                            if (response.status) {
+                                                console.log(response)
+                                                var countryOptions = `<optgroup label="States in ${countryObject[country]}" id="_countryStates_${country}">`;
+                                                optionGroup.push({
+                                                    value: countryObject[country],
+                                                    label: countryObject[country],
+                                                    id: country
+                                                });
+                                                Object.keys(response.states).forEach(stateCode => {
+                                                    countryOptions += `<option value="${country}.${stateCode}">${response.states[stateCode]}</option>`;
+                                                    optionList.push({
+                                                        text: response.states[stateCode],
+                                                        value: country + '.' + stateCode,
+                                                        groupLabel: `${countryObject[country]}`
+                                                    });
+
+                                                });
+                                                listTotal += Object.keys(response.states).length
+                                                countryOptions += `</optgroup>`;
+
+                                                countryList.push(country);
+                                            } else {
+                                                alertBar(response.message);
+                                            }
+                                        }).fail(e => {
+                                        console.log(e);
+                                        alertBar('Could not get ' + country + ' states');
+                                    });
+
+                                });
+                                var timerSet = setInterval(() => {
+                                    if (optionList.length > 0) {
+                                        clearInterval(timerSet);
+                                        var $select = jQuery('#to_state').selectize({
+                                            plugins: ['remove_button'],
+                                            persist: false,
+                                            create: true,
+                                            optgroupField: 'groupLabel',
+                                            labelField: 'text',
+                                            searchField: ['text'],
+                                            optgroupLabelField: optionGroup.value,
+                                            optgroups: optionGroup,
+                                            render: {
+                                                optgroup_header: function(data, escape) {
+                                                    return '<div class="optgroup-header" id="_country_' + data[0].id + '" data-group-id="' + escape(data.value) + '"><b>States in ' + escape(data.value) + '</b></div>';
+                                                }
+                                            }
+                                        });
+                                        var selectize = $select[0].selectize;
+                                        totalElements[optionGroup[0].id] = optionList;
+                                        selectize.addOption(optionList);
+                                        selectize.addOptionGroup(optionGroup[0].value, optionGroup);
+                                        selectize.refreshOptions();
+
+                                    }
+                                }, 100);
+                            }
+
+                            console.log(countryList);
+
+                        }
+                    });
+                </script>
 
             <?php } elseif ($this->settingTabs == 'apis') { ?>
 

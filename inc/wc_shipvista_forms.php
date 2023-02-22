@@ -4,7 +4,7 @@ namespace Shipvista\Forms;
 
 trait SLSR_WcShipvistaForms
 {
-    public $shipvistaFormMethods = ['connectForm', 'basicForm', 'apiForm', 'shipperForm', 'restrictionForm', 'dimensionForm', 'carriersForm'];
+    public $shipvistaFormMethods = ['connectForm', 'basicForm', 'apiForm', 'shipperForm', 'restrictionForm', 'dimensionForm', 'carriersForm', 'customShippingForm'];
     public $requiredForms = [];
 
     function init_form_fields()
@@ -23,7 +23,7 @@ trait SLSR_WcShipvistaForms
     public function getRequiredForms(string $pageForm)
     {
         $form_list = [];
-        $settings = ['dimension' => 'sv_dimensionForm', 'shipper' => 'sv_shipperForm', 'apis' => 'sv_apiForm', 'restrict' => 'sv_restrictionForm',  'basic' => 'sv_basicForm'];
+        $settings = ['dimension' => 'sv_dimensionForm', 'custom' => 'sv_customShippingForm', 'shipper' => 'sv_shipperForm', 'apis' => 'sv_apiForm', 'restrict' => 'sv_restrictionForm',  'basic' => 'sv_basicForm'];
         $settingTabs = isset($_GET['wcs_setting']) ? sanitize_text_field($_GET['wcs_setting']) : '';
         $skip = @$settings[$settingTabs] ?: 'sv_basicForm';
         foreach ($this->shipvistaFormMethods as $key => $method) {
@@ -74,7 +74,19 @@ trait SLSR_WcShipvistaForms
                 'desc_tip'    => true,
             ),
             'UPS_enabled' => array(
-                'title' => __('Enable Canada Post', 'shipvista'),
+                'title' => __('Enable UPS Post', 'shipvista'),
+                'type'        => 'hidden',
+                'class' => 'form-control mb-3 form-control-sm',
+                'desc_tip'    => true,
+            ),
+            'CANPAR' => array(
+                'title' => __('Default Carrier', 'shipvista'),
+                'type'        => 'hidden',
+                'class' => 'form-control mb-3 form-control-sm',
+                'desc_tip'    => true,
+            ),
+            'CANPAR_enabled' => array(
+                'title' => __('Enable CANPAR Post', 'shipvista'),
                 'type'        => 'hidden',
                 'class' => 'form-control mb-3 form-control-sm',
                 'desc_tip'    => true,
@@ -183,83 +195,30 @@ trait SLSR_WcShipvistaForms
         );
     }
 
+
     public function sv_shipperForm()
     {
 
         return array(
-            'shipvista_user_email' => array(
+            'shipvista_address_book' => array(
                 'type'        => 'hidden',
                 'desc_tip'    => true,
-            ),
-            'shipvista_origin_address' => array(
-                'title' => __('Origin Address', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping address (Shipping from address).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'desc_tip'    => true,
-                'required' => true,
-            ),
-            'shipvista_origin_address_2' => array(
-                'title' => __('Origin Address 2', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping address 2 (Shipping from address).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'desc_tip'    => true,
-                'required' => true,
-            ),
-            'shipvista_origin_state' => array(
-                'title' => __('Origin State', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping state (Shipping from state).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'desc_tip'    => true,
-                'required' => true,
-                'maxlength' => 2,
-            ),
-            'shipvista_origin_city' => array(
-                'title' => __('Origin City', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping city (Shipping from city).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'desc_tip'    => true,
-                'required' => true,
-            ),
-            'shipvista_origin_country' => array(
-                'title' => __('Origin Country', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping country (Shipping from country).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'required' => true,
-                'desc_tip'    => true,
-                'maxlength'    => 2,
-            ),
-            'shipvista_origin_postcode' => array(
-                'title' => __('Origin Postcode', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping postcode (Shipping from postcode).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'required' => true,
-                'desc_tip'    => true,
-            ),
-            'shipvista_origin_phone_number' => array(
-                'title' => __('Origin Phone Number', 'shipvista'),
-                'type'        => 'text',
-                'description' => 'Shipping phone (Shipping from phone).',
-                'class' => 'form-control mb-3 form-control-sm',
-                'required' => true,
-                'desc_tip'    => true,
-            ),
-            'shipvista_user_currency' => array(
-                'label_class' => ' d-none ',
-                'type' => 'hidden',
-            ),
-            'shipvista_user_balance' => array(
-                'label_class' => ' d-none ',
-                'type' => 'hidden',
             )
-
         );
     }
+
+    
+    public function sv_customShippingForm()
+    {
+
+        return array(
+            'shipvista_custom_shipping_method' => array(
+                'type'        => 'hidden',
+                'desc_tip'    => true,
+            )
+        );
+    }
+
 
     public function sv_reportForm()
     {
@@ -408,6 +367,14 @@ trait SLSR_WcShipvistaForms
                 'type' => 'hidden',
             ),
             'shipvista_token_expires' => array(
+                'label_class' => ' d-none ',
+                'type' => 'hidden',
+            ),
+            'shipvista_token_request_date' => array(
+                'label_class' => ' d-none ',
+                'type' => 'hidden',
+            ),
+            'api_status_ok' => array(
                 'label_class' => ' d-none ',
                 'type' => 'hidden',
             ),

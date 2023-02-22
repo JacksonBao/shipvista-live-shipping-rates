@@ -1,4 +1,20 @@
+ .sv_toggle_cart_shipping{
+  display: block !important;
+
+ }
  
+ .font-14{
+  font-size: 14px !important;
+ }
+
+ .woocommerce-shipping-totals > td{
+  display: table-cell !important;
+ }
+ 
+ form.sv_d-none{
+  display: none !important;
+ }
+
 .sv_radio {
     border-radius: 50% !important;
 }
@@ -37,7 +53,6 @@ position:absolute;
 	
 }
 .sv_loaderImg{
-	
     height:40px;
     width:40px;
     margin-left: auto;

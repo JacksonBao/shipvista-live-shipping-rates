@@ -6,7 +6,7 @@ use Exception;
 
 trait SLSR_WcShipvistaFunctions
 {
-  public $registeredCarriers = ['CanadaPost', 'UPS'];
+  public $registeredCarriers = ['CanadaPost', 'UPS', 'CANPAR'];
   private $baseApiUrl = 'https://api.shipvista.com/api/';
   public $apiHttpErrorCode;
   public $errorLogKeys = ['Authentication'];
@@ -19,6 +19,10 @@ trait SLSR_WcShipvistaFunctions
     'UPS' => [
       'name' => 'UPS',
       'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/ups_logo.png'
+    ],
+    'CANPAR' => [
+      'name' => 'CANPAR',
+      'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/canpar_logo.png'
     ]
   ];
 
@@ -63,37 +67,116 @@ trait SLSR_WcShipvistaFunctions
     return $result;
   }
 
+
+  function loopAddressBook(array $destination)
+  {
+    $addresses = $this->get_option("shipvista_address_book") ?: '[]';
+    try {
+
+      $match = '';
+      $addresses = (array) json_decode($addresses, true);
+      if (count($addresses) > 0) {
+        foreach ($addresses as $key => $address) {
+          $toAddress = $address['to_address'];
+          if (empty($toAddress['country']) && empty($toAddress['state']) && empty($toAddress['zip_code'])) { // any address 
+            $match = $key;
+            break;
+          } else {
+            // $state = extract($address['to_address'], EXTR_PREFIX_SAME, 'CA');
+            // extract
+            if (isset($destination['countryCode'])) {
+              $fromCountry = strtoupper($destination['countryCode']);
+              $countryPass = 1;
+              $country = $toAddress['country'];
+              if (!empty($country)) {
+                $country = is_array($country) ? $country : explode(',', str_replace(' ', '', strtoupper(trim($country))));
+                if (!in_array($fromCountry, $country)) {
+                  $countryPass = 0;
+                }
+              }
+              $statePass = 1;
+              $zipcodePass = 0;
+
+              if ($countryPass) {
+                $fromState = strtoupper($destination['stateCode']);
+                $state = isset($toAddress['state'][$fromCountry]) ? $toAddress['state'][$fromCountry] : [];
+                if (!empty($state)) {
+                  $state = $state;
+                  if (!in_array($fromState, $state)) {
+                    $statePass = 0;
+                  }
+                }
+
+                if ($statePass) {
+                  $fromZipcode = strtoupper($destination['postalCode']);
+                  $zip_code = $toAddress['zip_code'];
+
+                  if (!empty($zip_code)) {
+                    $zipcodes = explode(',', str_replace(' ', '', strtoupper(trim($zip_code))));
+                    foreach ($zipcodes as $zipcode) {
+                      $length = strlen($zipcode);
+                      if (strtolower(substr($fromZipcode, 0, $length)) == strtolower($zipcode)) {
+                        $zipcodePass = 1;
+                        break;
+                      }
+                    }
+                  } else {
+                    $zipcodePass = 1;
+                  }
+                }
+              }
+
+              if ($countryPass == 1 && $statePass == 1 && $zipcodePass == 1) {
+                $match = $key;
+                break;
+              }
+            }
+          }
+        }
+
+        if (array_key_exists($match, $addresses)) {
+          $addressData = $addresses[$match]['from_address'];
+          return [
+            'postalCode' =>   $addressData['zip_code'],
+            'countryCode' => $addressData['country'],
+            'stateCode' => $addressData['state'],
+            'residential' => true
+          ];
+        }
+      }
+
+      return false;
+    } catch (Exception $e) {
+      return false;
+    }
+  }
+
   /**
    * Get user shipping from address
    */
-  public function getShipFromAddress()
+  public function getShipFromAddress(array $destination)
   {
-    // The country/state
-    $store_raw_country = get_option('woocommerce_default_country');
-    // Split the country/state
-    $split_country = explode(":", $store_raw_country);
+    // get countries
+    $countryObject = $this->loopAddressBook($destination);
 
-    // Country and state separated:
-    $store_country = $split_country[0];
-    $store_state   = $split_country[1];
-
-    $country = $this->get_option('shipvista_origin_country') ?? $store_country;
-    $postcode = $this->get_option('shipvista_origin_postcode') ?? $this->get_option('woocommerce_store_postcode');
-    $city = $this->get_option('shipvista_origin_city') ?? $this->get_option('woocommerce_store_city');
-    $state = $this->get_option('shipvista_origin_state') ?? $store_state;
-    $address = $this->get_option('shipvista_origin_address') ?? $this->get_option('woocommerce_store_address');
-    $address_2 = $this->get_option('shipvista_origin_address_2') ??  $this->get_option('woocommerce_store_address_2');
-
-    if (!empty($postcode) && !empty($country)) {
-      return [
-        'postalCode' =>  str_replace(' ', '', $postcode),
-        'countryCode' => strtoupper($country),
-        'stateCode' => $state,
-        'city' => $city,
-        'streetAddress' => $address,
-        'streetAddress2' => $address_2,
-        'residential' => true
-      ];
+    if (is_array($countryObject) && isset($countryObject['postalCode'])) {
+      return $countryObject;
+    } else {
+      // The country/state
+      $store_raw_country = get_option('woocommerce_default_country');
+      // Split the country/state
+      list($country, $state) = explode(":", $store_raw_country);
+      $postcode = get_option('woocommerce_store_postcode');
+      if (isset($country) && isset($postcode)) {
+        $city = get_option('woocommerce_store_city');
+        return [
+          'postalCode' =>  str_replace(' ', '', $postcode),
+          'countryCode' => strtoupper($country),
+          'stateCode' => $state,
+          'city' => $city,
+          'residential' => true
+        ];
+      }
     }
 
     return false;
@@ -105,7 +188,7 @@ trait SLSR_WcShipvistaFunctions
       $result = [
         'postalCode' => str_replace(' ', '', $order->get_shipping_postcode()),
         'countryCode' => $order->get_shipping_country(),
-        'stateCode' => $order->get_shipping_state(),
+        'state' => $order->get_shipping_state(),
         'city' => $order->get_shipping_city(),
         'streetAddress' => $order->get_shipping_address_1(),
         'streetAddress2' => $order->get_shipping_address_2(),
@@ -184,7 +267,7 @@ trait SLSR_WcShipvistaFunctions
       <div class="">
         <div class="mb-3 border-bottom">
         <small>TRACKING NUMBER</small>
-        <h4><a class="text-dark" target="_blank" href="https://shipvista.com/Trackmyshipment?trackingnumber=' . $tracking . '">' . $tracking . '</a></h4>
+        <h4><a class="text-dark" target="_blank" href="https://shipvista.com/track-shipment?trackingnumber=' . $tracking . '">' . $tracking . '</a></h4>
         </div>
         <div class="">
         <small>LABEL</small>
@@ -267,30 +350,42 @@ trait SLSR_WcShipvistaFunctions
 
   public function checkToken()
   {
-    $expires = $this->get_option('shipvista_token_expires');
+    // $expires = $this->get_option('shipvista_token_expires');
+    $expires = $this->get_option('shipvista_token_request_date');
+    $today = strtotime('now');
     if (!empty($expires)) {
-      $dateExpires = date('Ymd', strtotime($expires));
-      $today = date('Ymd');
-      // check days
-      if ($today > $dateExpires) {
-        // refresh token
-        $user = $this->get_option('shipvista_user_name');
-        $pass = $this->get_option('shipvista_user_pass');
-        $refreshObject = $this->shipvistaApi('Login', ['user_id' => $user, 'password' => $pass], 'POST');
-
-        if (array_key_exists('user_id', $refreshObject)) {
-          $this->update_option('shipvista_api_token', $refreshObject['access_token']['tokenString']);
-          $this->update_option('shipvista_refresh_token', $refreshObject['refresh_token']['tokenString']);
-          $this->update_option('shipvista_token_expires', $refreshObject['access_token']['expireAt']);
-          $this->update_option('shipvista_plugin_errors', '');
-          $this->SLSR_pluginLogs('Authentication', 'Token refreshed successfully');
-        } else { // could not refresh the token there was an error
-          $this->SLSR_pluginLogs('Authentication', 'Could not refresh your access token on shipvista.com');
-        }
-
-        // refresh token
+      $dateExpires =  (int) $expires;
+      $diff = round(abs($today - $dateExpires) / 60);
+      if($diff < 0){
+        $diff = 31;
       }
+    } else {
+
+      $this->SLSR_pluginLogs('Authentication', 'Token expires not found');
+      $diff = 31;
     }
+    // check days
+    if ($diff >= 25) {
+      // refresh token
+      $user = $this->get_option('shipvista_user_name');
+      $pass = $this->get_option('shipvista_user_pass');
+      $refreshObject = $this->shipvistaApi('Login', ['user_id' => $user, 'password' => $pass], 'POST');
+
+      if (array_key_exists('user_id', $refreshObject)) {
+        $this->update_option('api_status_ok', 'yes');
+        $this->update_option('shipvista_api_token', $refreshObject['access_token']['tokenString']);
+        $this->update_option('shipvista_refresh_token', $refreshObject['refresh_token']['tokenString']);
+        $this->update_option('shipvista_token_expires', $refreshObject['access_token']['expireAt']);
+        $this->update_option('shipvista_token_request_date', $today);
+        $this->update_option('shipvista_plugin_errors', '');
+        $this->SLSR_pluginLogs('Authentication', 'Token refreshed successfully, after ' . " $diff minutes");
+      } else { // could not refresh the token there was an error
+        $this->update_option('api_status_ok', 'no');
+        $this->SLSR_pluginLogs('Authentication', 'Could not refresh your access token on shipvista.com');
+      }
+
+      // refresh token
+    } 
   }
 
   public function SLSR_pluginLogs($title,  ?string $error)
@@ -313,6 +408,64 @@ trait SLSR_WcShipvistaFunctions
   }
 
   /**
+   * @return array $rateList
+   */
+  public function getCustomRates(int $isFallBack = 1)
+  {
+    global $woocommerce;
+    $cartTotal = preg_replace("/&#?[a-z0-9]+;/i", '', $woocommerce->cart->get_cart_total());
+    $cartTotal = (float) preg_replace('#[^0-9\.]#', '', str_replace(',', '.', $cartTotal));
+    $customRates = $this->get_option('shipvista_custom_shipping_method') ?: '[]';
+    $customRates = json_decode($customRates, true);
+    $ratesList = [];
+    // loop through rates
+    foreach ($customRates as $key => $rate) {
+      switch ($rate['type']) {
+        case 'flat':
+          if (isset($rate['fallback']) && ($rate['fallback'] == $isFallBack || $rate['fallback']  == 0)) {
+            $ratesList[] = [
+              'id' => "shipvista_custom_flat_$key",
+              'label' => $rate['displayName'],
+              'cost' => (float)$rate['cost'],
+              'meta_data' => [
+                'transit' => $rate['deliveryDays'],
+                'free' => false,
+                'is_default' => false,
+                'attribute' => '',
+                'carrier' => 'Shipvista Custom Rate'
+              ]
+            ];
+          }
+          break;
+        case 'free':
+          $list = [];
+          if ($rate['requires'] == 'minimum_order_amount') {
+            if ($cartTotal >= $rate['cost']) {
+              $list = [
+                'label' => $rate['displayName'],
+                'cost' => 0,
+                'meta_data' => [
+                  'transit' => $rate['deliveryDays'],
+                  'free' => true,
+                  'rate' => 0,
+                  'is_default' => false,
+                  'attribute' => '',
+                  'carrier' => 'Shipvista Custom Rate'
+                ]
+              ];
+            }
+          }
+          if ($list) {
+            $list['id'] = 'shipvista_custom_free_' . $key;
+          }
+          $ratesList[] = $list;
+          break;
+      }
+    }
+    return $ratesList;
+  }
+
+  /**
    * Get plugin default rates
    */
   public function getDefaultRates($missingAddress = false)
@@ -328,7 +481,7 @@ trait SLSR_WcShipvistaFunctions
       $totaltems = count($this->shippingList['list']);
       $shippingPrice *= $totaltems;
     }
-    $title = 'Flat Rate'; 
+    $title = 'Flat Rate';
     $rateList = [];
     if ($missingAddress != false) {
       $title = 'Address: Enter a valid postal code to get shipping cost.';
@@ -342,6 +495,12 @@ trait SLSR_WcShipvistaFunctions
         ]
       ];
     }
+
+    // call to get custom rates
+
+    $custom = $missingAddress === 0 ? 0 : 1;
+    $customRates = $this->getCustomRates($custom);
+    $rateList = [...$rateList, ...$customRates];
     return $rateList;
   }
 
@@ -376,6 +535,8 @@ trait SLSR_WcShipvistaFunctions
   public function SLSR_getApiHeaders()
   {
     // 'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+    // check if the token is expired and refresh
+    // $this->checkToken();
     $headers = [
       'Content-Type' => 'application/json',
       'Accept' => 'application/json',
@@ -405,13 +566,13 @@ trait SLSR_WcShipvistaFunctions
   {
     $body = [
       'method' => $type,
-      'body' => json_encode($post_fields),
+      'body' => (is_array($post_fields) ? json_encode($post_fields) : []),
       'headers' => $headers,
       'sslverify' => 1
     ];
     $result = wp_remote_request($url, $body);
 
-    $this->SLSR_pluginLogs('API_request', json_encode($post_fields));
+    $this->SLSR_pluginLogs('API_request', json_encode(['HEADER' => $headers, 'POST' => $post_fields]));
     if (is_wp_error($result)) {
       $msg = $result->get_error_message();
       $this->SLSR_pluginLogs('API_ERR', $msg);

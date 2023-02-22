@@ -2,6 +2,18 @@
 var shipvistaShippingSellected = 0;
 var viewChange = 0;
 
+
+function toggleUpdateForm(){
+    if(document.getElementsByClassName('woocommerce-shipping-calculator')[0].classList.contains('sv_d-none')) {
+        document.getElementsByClassName('woocommerce-shipping-calculator')[0].classList.remove('sv_d-none')
+        document.querySelector('.shipping-calculator-form').removeAttribute('style');
+    } else {
+        document.getElementsByClassName('woocommerce-shipping-calculator')[0].classList.add('sv_d-none')
+        document.querySelector('.shipping-calculator-form').removeAttribute('style');
+
+    }
+}
+
 function shipvistaSelected(id) {
     if (id >= 0) {
         setTimeout(() => {
@@ -117,12 +129,12 @@ function toggleCartShippingFields() {
         if (ele.classList.contains('sv_d-none')) {
             ele.classList.remove('sv_d-none');
             if(document.getElementsByClassName('shipping-calculator-form')[0]){
-                // document.getElementsByClassName('shipping-calculator-form')[0].viewChangeStyle.display = 'block';
+                document.getElementsByClassName('shipping-calculator-form')[0].style.display = 'block !important';
             }
         } else {
             ele.classList.add('sv_d-none');
             if(document.getElementsByClassName('shipping-calculator-form')[0]){
-                // document.getElementsByClassName('shipping-calculator-form')[0].viewChangeStyle.display = 'none';
+                document.getElementsByClassName('shipping-calculator-form')[0].style.display = 'none !important';
             }
         }
     }
@@ -203,8 +215,8 @@ function structureCartView() {
                 document.getElementsByClassName('woocommerce-shipping-destination')[0].innerHTML = '';
 
                 document.getElementsByClassName('woocommerce-shipping-calculator')[0].classList.add('sv_d-none', 'sv_toggle_cart_shipping');
-                document.getElementById('calc_shipping_state_field').classList.add('sv_d-none');
-                document.getElementById('calc_shipping_city_field').classList.add('sv_d-none');
+                // document.getElementById('calc_shipping_state_field').classList.add('sv_d-none');
+                // document.getElementById('calc_shipping_city_field').classList.add('sv_d-none');
 
                 var parent = document.getElementsByClassName('woocommerce-shipping-methods')[0].parentNode;
                 var appendHeader = '';
@@ -236,8 +248,8 @@ function structureCartView() {
             } else {
                 if (currentPage == 'cart' && i == 0) {
                     colSpan = 'colspan="2"';
-                    document.getElementById('calc_shipping_state_field').classList.add('sv_d-none');
-                    document.getElementById('calc_shipping_city_field').classList.add('sv_d-none');
+                    // document.getElementById('calc_shipping_state_field').classList.add('sv_d-none');
+                    // document.getElementById('calc_shipping_city_field').classList.add('sv_d-none');
                     document.getElementsByClassName('woocommerce-shipping-calculator')[0].classList.add('sv_d-none', 'sv_toggle_cart_shipping');
 
                     try {

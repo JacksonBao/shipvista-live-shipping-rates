@@ -27,11 +27,11 @@ trait SLSR_WcShipvistaRates
             $destinationAddress = [
                 'postalCode' =>   preg_replace('#[^a-zA-Z0-9]#i', '', (str_replace(' ', '', $destination['postcode']) ?: @$address['postcode'])),
                 'countryCode' => strtoupper($country_code),
-                'state' => ($destination['state'] ?: ''),
+                'stateCode' => ($destination['state'] ?: ''),
                 'city' => ($destination['city'] ?: ''),
                 'streetAddress' => (substr($destination['address'], 0, 50) ?: ''),
                 'streetAddress2' => (substr($destination['address_2'], 0, 50) ?: ''),
-                'residential' => true
+                'residential' => false
             ];
         }
 
@@ -39,17 +39,27 @@ trait SLSR_WcShipvistaRates
         $this->shippingToCountry = $destinationAddress['countryCode'];
         $this->shippingToPostcode = $destinationAddress['postalCode'];
 
-
-        $fromAddress = $this->getShipFromAddress();
-
+        
+        // $check = ['countryCode' => $destination['country'], 'postalCode' => $destination['postcode'], 'stateCode' => $destination['state']];
+        $fromAddress = $this->getShipFromAddress( $destinationAddress );
+        $this->SLSR_pluginLogs('fromAddress', json_encode($fromAddress) . "\n" . json_encode($destination));
+        
+        //Remove state code
+        if(isset($destinationAddress['stateCode']) && empty($destinationAddress['stateCode'])){
+            unset($destinationAddress['stateCode']);
+        }
+        $metricList = ['kg' => 'METRIC', 'lbs' => 'IMPERIAL'];
         if ($fromAddress != false) {
             if (strlen($destinationAddress['postalCode']) > 0) {
+                $storeUnit = strtolower(get_option('woocommerce_weight_unit'));
+                $metric = isset($metricList[$storeUnit]) ? $metricList[$storeUnit] : $metricList['kg'];
+                $fromAddress['residential'] = false;
                 $itemList = $this->shippingItemList($package, $isAdmin);
                 $apiObject = [
                     'FromAddress' => $fromAddress,
                     'ToAddress' => $destinationAddress,
-                    "unitOfMeasurement" => "METRIC",
-                    "currency" => $this->get_option('shipvista_user_currency') ?? $this->get_option('woocommerce_currency') ?? 'USD',
+                    "unitOfMeasurement" => $metric,
+                    "currency" =>  get_option('woocommerce_currency') ?? $this->get_option('shipvista_user_currency') ?? 'USD',
                     "lineItems" => $itemList
                     //"carrierServiceTypeList" => []
                 ];
@@ -90,7 +100,7 @@ trait SLSR_WcShipvistaRates
                 return $this->getDefaultRates(true);
             }
         } else {
-            return $this->getDefaultRates();
+            return $this->getDefaultRates(0);
         }
     }
 
@@ -142,7 +152,7 @@ trait SLSR_WcShipvistaRates
 
         foreach ($items as $item => $values) {
 
-            $quantity = isset($values['quanity']) ?  $values['quantity'] : 1;
+            $quantity = isset($values['quantity']) ?  $values['quantity'] : 1;
             $_product =  wc_get_product(($isAdmin == true ? $values->get_product_id() : $values['data']->get_id()));
             if (!$_product) {
                 continue;
@@ -153,37 +163,25 @@ trait SLSR_WcShipvistaRates
             $width = $_product->get_width() ?: ($this->get_option('shipvista_dimension_width') > 0 ?  $this->get_option('shipvista_dimension_width') :  2);
             $height = $_product->get_height() ?: ($this->get_option('shipvista_dimension_height') > 0 ?  $this->get_option('shipvista_dimension_height') :  1);
             $weight = $_product->get_weight() ?: ($this->get_option('shipvista_dimension_weight') > 0 ?  $this->get_option('shipvista_dimension_weight') :  1);
-            $weight *= $quantity;
 
-            
-            if ($length > 25) {
-                $length = 25;
-            }
-
-            if ($width > 25) {
-                $width = 25;
-            }
-
-            if ($height > 25) {
-                $height = 25;
-            }
-            
             // set weight max to 30kg
             if ($weight > 30) {
                 $weight = $this->get_option('shipvista_dimension_weight') ?: 1;
             }
 
-            $shippingList[] = [
-                'length' => (round($length) ?: 1),
-                'width' => (round($width) ?: 1),
-                'height' => (round($height) ?: 1),
-                'weight' => (float) ($weight),
-                'declaredValue' => [
-                    'currency' => $this->get_option('shipvista_user_currency'),
-                    'amount' => ($price * $quantity ?: 0)
-                ],
-                'description' => $title
-            ];
+            for ($iq=0; $iq < $quantity; $iq++) { 
+                $shippingList[] = [
+                    'length' => (round($length) ?: 1),
+                    'width' => (round($width) ?: 1),
+                    'height' => (round($height) ?: 1),
+                    'weight' => (float) ($weight),
+                    'declaredValue' => [
+                        'currency' => $this->get_option('shipvista_user_currency'),
+                        'amount' => ($price * $quantity ?: 0)
+                    ],
+                    'description' =>  $title
+                ];
+            }
             $totalQuantity += $quantity;
         }
         $this->shippingList['list'] = $shippingList;
@@ -202,7 +200,7 @@ trait SLSR_WcShipvistaRates
 
     function structureRestrictions(string $country_code)
     {
-        $restrictions = strtoupper(str_replace(' ', '', preg_Replace('#[^a-zA-Z0-9\,\:\|]#i', '', $this->get_option('_restricted_locations'))));
+        $restrictions = strtoupper(str_replace(' ', '', preg_Replace('#[^a-zA-Z0-9\,\:\|]#i', '', $this->get_option('shipvista_restricted_locations'))));
         if (strlen($restrictions) > 0) {
             $countryExp = explode('|', $restrictions);
             foreach ($countryExp as $countryEl) {
@@ -265,14 +263,11 @@ trait SLSR_WcShipvistaRates
 
                 $isFreeShipping =  $this->get_option('shipvista_free_shipping');
                 $freeShippingMax = (float) $this->get_option('shipvista_free_max_amount');
-                $handlingTime = ((float) $this->get_option('shipvista_free_shipping_days') ?: 0) + $handlingTime;
 
 
-
-
-
-
-                if ($isFreeShipping == 1 && $freeShippingMax == '' && $canApplyDiscount == true) {
+                if ($isFreeShipping == 1 && $freeShippingMax == '' && $canApplyDiscount == true) 
+                {
+                    $handlingTime = ((float) $this->get_option('shipvista_free_shipping_days') ?: 0) + $handlingTime;
                     $shippingList[] = [
                         'id' => 'shipvista_free',
                         'label' =>   'Free shipping' . ($handlingTime > 0 ? ': in ' . $handlingTime . ' day' . ($handlingTime > 1 ? 's' : '')  : ''),
@@ -309,7 +304,7 @@ trait SLSR_WcShipvistaRates
                     if (in_array($carrierName, $activeCarriers)) {
                         $serviceName = trim($rate['shippingService']['name']); //  reset for usa and canda
                         // $serviceName = trim(str_replace(['USA', 'CAD'], '', $rate['shippingService']['name'])); //  reset for usa and canda
-                        $transit = (int) $rate['shippingService']['expectedTransitTime'];
+                        $transit = $this->calculateTransitTime($rate['shippingService']);
                         if ($transit > 0) {
                             $transit += $handlingTime;
                         } else {
@@ -356,7 +351,7 @@ trait SLSR_WcShipvistaRates
                                 $list = [
                                     'id' => 'shipvista_' . $rate['shippingService']['code'],
                                     'label' => $serviceName,
-                                    'cost' => (float)$rateAmount,
+                                    'cost' => (float) round($rateAmount, 2),
                                     'meta_data' => [
                                         'transit' => $transit,
                                         'free' => $isFreeShipping,
@@ -364,7 +359,7 @@ trait SLSR_WcShipvistaRates
                                         'is_default' => false,
                                         'attribute' => '',
                                         'realRate' => $originalRate,
-                                        'carrier' => (isset($this->carrierDetails[$carrierName]) ? $this->carrierDetails[$carrierName]['name'] : $serviceName)
+                                        'carrier' => (isset($this->carrierDetails[$carrierName]) ? $this->carrierDetails[$carrierName]['name'] : $carrierName)
                                     ]
                                 ];
                                 //die(var_dump($list));
@@ -380,6 +375,9 @@ trait SLSR_WcShipvistaRates
                     }
                 }
 
+                // get custom shipping rates 
+                $customRates = $this->getCustomRates(0);
+                $shippingList = [...$shippingList, ...$customRates];
 
                 if (count($shippingList) > 0) {
                     $this->getRateRanking($shippingList);
@@ -399,6 +397,24 @@ trait SLSR_WcShipvistaRates
     }
 
 
+
+    public function calculateTransitTime( $service )
+    {
+        $expected = (int) $service['expectedTransitTime'];
+        if($expected < 1) {
+            if(isset($service['expectedDeliveryDate'])){
+                $split = explode('t', strtolower($service['expectedDeliveryDate']))[0];
+                $now = strtotime('now');
+                $expectedTime = strtotime($split);
+                $time = round(($expectedTime - $now) / (60 * 60 * 24));
+                if($time > 0) {
+                    $expected = $time; 
+                }
+            }
+        }
+
+        return $expected;
+    }
 
     public function getRateRanking(array &$rates)
     {

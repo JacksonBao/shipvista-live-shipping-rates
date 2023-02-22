@@ -1,36 +1,54 @@
 = Shipvista Live Shipping Rates =
 Tags: shipping, delivery, logistics, woocomemrce, free shipping, live rates, Canada post, Shipvista
-Requires at least: 1.0.0
-Tested up to: 5.8
-Stable tag: 1.0.0
-Requires PHP: 5.4.0
+Requires at least: 5.0.0
+Tested up to: 6.0.1
+Stable tag: 3.0.8
+Requires PHP: 7.4.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 
 == Description ==
 
-Shipvista live shipping rates is free a WordPress - WooCommerce extension that helps you completely automate Canada Post and UPS shipping by displaying real-time rates on the cart/checkout page. Using this plugin requires you to create a shipvista.com account. Creating an account is free and your account will be connected to this plugin in order for you to be able to get live shipping rates.  The current beta version supports Canada Post and UPS. More carriers will be added in the subsequent releases.
+Shipvista live shipping rates is a free WordPress – WooCommerce **multi-warehouses and multi-carriers (Canada Post, UPS, Canpar and more)** extension that aims to provide your customers with live shipping cost and delivery estimates on your store's checkout page. Exclusively free to all new and existing valid ShipVista account users. Using this plugin requires you to create a shipvista.com account. Creating an account is free, and your account will be connected to this plugin for you to be able to get live shipping rates.  
+
+Create Store transparency and a better customer experience with our One-Click Shipping Calculator. Reduce abandoned carts by showing your customers' shipping information upfront.
 
 [Read more](https://shipvista.com/about)
 
 === Why choose Shipvista's Live Shipping Rates ===
 
-With Shipvista Live Shipping Rates you do not need to have accounts with the various carriers to obtain live rates, you can benefit from displaying live shipping rates on your WooCommerce store and expected delivery dates to customers at checkout with the shipvista plugin, print shipping labels, track WooCommerce shipments, and more!
+With Shipvista Live Shipping Rates, you do not need to have accounts with the various significant carriers to obtain live rates; you can benefit from displaying live shipping rates on your WooCommerce store at checkout. This plugin works seamlessly by showing the estimated delivery date on the Cart and store checkout to provide a complete shipping solution for your business. The current beta version supports Canada Post and UPS. More carriers will be added in the subsequent releases. 
+
 
 === Main features of Shipvista Live Shipping Rates ===
 
-* Get real-time shipping rates on WooCommerce Cart & Checkout page.
-* Add margins to shipping rates.
-* Create custom amount for shipping discount on live rates.
-* Enable In-store pickup and note.
-* Add Custom handling times.
-* Set Default shipping from address.
-* Set default shipping dimensions for products with missing dimensions.
-* Connect to Google Places API to enable your customers to enter their address faster and accurately.
-* Set restrictions where shipping discounts will not apply based on country and postal/zip codes.
-* Adding handling fee to the shipping cost.
-* Compatible with default woocommerce shipping rates.
+* Get real-time shipping rates on WooCommerce Cart & Checkout page. 
+* Customizable with Multi-Warehouse and Multi-Carriers (Canada Post, UPS, and more) 
+* Enable in-store Pickups, set volumetric and free shipping rules, and Much More. 
+* Set geolocation and Postal or Zip code rules for better operational efficiency. 
+* Enable Google Places API to allow customers to enter their addresses accurately. 
+* Add custom processing times
+* Set default shipping dimensions for products with missing dimensions
+* Set restrictions where shipping discounts will not apply based on country and postal/zip codes
+* Add handling charges to shipping charges
+* Compatible with default store shipping rates
+* Select the carriers and shipping methods you accept
+
+**Note: Adding weight attributes to all products is a prerequisite for the extension to work. However, you can set default shipping attributes on the settings page under "Dimension".**
+
+
+== KEY BENEFITS ==
+**Reduce abandoned carts:** By showing your customers' shipping information upfront, they can see accurate shipping rates, which minimizes abandoned carts.
+
+**Better customer experience:** Use of multiple precise warehouses and geolocation to automatically display shipping rates and delivery estimates for Canada Post, UPS, Canpar and more.
+
+**One-Click Shipping Calculator:** This shipping rate calculator installs in one click and requires little configuration and no maintenance. A shipping calculator in a minute!
+Use our pre-negotiated shipping rates or connect your own carrier accounts.
+
+**Support and grow your business:** Automate workflows throughout the execution journey. Benefit from experienced shipping support. Create a brand and post-purchase experience.
+
+Now you too can take advantage by Leveraging the same inventory and fulfillment technology used by e-commerce leaders.
 
 === How does shipvista live shipping rates plugin work? ===
 
@@ -46,7 +64,7 @@ Note: *Adding weight attributes to all the products is a prerequisite for the pl
 
 === Why do i need a Shipvista.com account? ===
 
-* Multi-Carrier access: Shipvista enables you to get rates from all supported carriers such as Canada Post and UPS without having an account with any of these carriers.
+* Multi-Carrier access: Shipvista enables you to get rates from all supported carriers such as Canada Post, Canpar and UPS without having an account with any of these carriers.
 * Link Carriers: Seamlessly link your shipping account from various carriers to shipvista, in other to use your account shipping rates directly from the carrier.
 * Ship instantly: Access to a free online system used to process shipments instantly.
 * Shipping label: Generate carrier-approved BOL and AWB shipping labels.

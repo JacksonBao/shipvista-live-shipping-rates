@@ -16,7 +16,7 @@
 
             foreach ($this->carriers as $carrier => $list) { ?>
 
-                <div class="sv_col-12 sv_col-md-6">
+                <div class="sv_col-12 sv_col-md-6 sv_mb-3">
                     <div class="sv_card sv_p-0">
                         <div class="sv_card-header" style="line-height: 45px;">
                             <div class="sv_d-flex justify-content-middle">
