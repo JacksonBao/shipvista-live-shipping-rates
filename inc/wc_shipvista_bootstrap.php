@@ -126,7 +126,8 @@ class SLSR_WcShipvistaBootstrap extends SLSR_Shipvista
         $this->carrier_settings['CanadaPost'] = (array) @json_decode($this->get_option('CanadaPost')) ?: [];
         $this->carrier_settings['UPS'] = (array) @json_decode($this->get_option('UPS')) ?: [];
         $this->carrier_settings['CANPAR'] = (array) @json_decode($this->get_option('CANPAR')) ?: [];
-        $merge = array_merge($this->carrier_settings['CanadaPost'], $this->carrier_settings['UPS'], $this->carrier_settings['CANPAR']);
+        $this->carrier_settings['USPS'] = (array) @json_decode($this->get_option('USPS')) ?: [];
+        $merge = array_merge($this->carrier_settings['CanadaPost'], $this->carrier_settings['UPS'], $this->carrier_settings['CANPAR'], $this->carrier_settings['USPS']);
         foreach ($carriers as $key => $carrier) {
             foreach($carrier as $k => $item){
                 $carriers[$key][$k]['checked']  = false;

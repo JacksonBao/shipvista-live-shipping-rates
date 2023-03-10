@@ -302,12 +302,19 @@
                                             </select>
                                         </div>
 
-                                        <div class="mb-3">
+                                        <div class="mb-3 sv_row">
+                                            <div class="sv_col-12 sv_col-md-6">
                                             <div class="sv_float-right"> <?php echo wc_help_tip("Select a valid ship from state."); ?> </div>
                                             <label for="">State</label>
                                             <select name="from_state" disabled id="from_state" class="form-control custom-select" style="max-width: 100% !important;">
                                                 <option>Selecte State</option>
                                             </select>
+                                            </div>
+                                            <div class="sv_col-12 sv_col-md-6">
+                                            <div class="sv_float-right"> <?php echo wc_help_tip("Enter city."); ?> </div>
+                                                <label for="">City</label>
+                                                <input type="text" class="sv_form-control" id="from_city" name="from_city" />
+                                            </div>
                                             <!-- <input type="text" minlength="2" maxlength="2" class="form-control" id="from_state" placeholder="State"> -->
                                         </div>
 
@@ -372,7 +379,7 @@
                                         // set default location
                                         array_unshift($destinations, [
                                             'nickname' => 'Default Ship from location',
-                                            'from_address' => ['country' => $this->content['storeLocation']['countryCode'], 'state' => $this->content['storeLocation']['stateCode'], 'zip_code' => $this->content['storeLocation']['postalCode']],
+                                            'from_address' => ['country' => $this->content['storeLocation']['countryCode'], 'state' => $this->content['storeLocation']['stateCode'], 'city' => $this->content['storeLocation']['city'], 'zip_code' => $this->content['storeLocation']['postalCode']],
                                             'to_address' => ['country' => '', 'state' => '', 'zip_code' => ''],
                                         ]);
                                         // die(var_dump($destinations));
@@ -401,7 +408,7 @@
                                                             </div>
                                                         <?php } ?>
 
-                                                        <div class="col-12 col-md-4">
+                                                        <div class="col-12 col-md-5">
                                                             <div class="mb-2"><small>Warehouse Address</small></div>
                                                             <div class="mb-2">
                                                                 <div class="d-flex">
@@ -415,6 +422,12 @@
                                                                         <b><?php echo $destination['from_address']['state']; ?></b>
                                                                     </div>
 
+                                                                    
+                                                                    <div class="flex-fill">
+                                                                        <small>City</small> <br>
+                                                                        <div style="max-width: 80px;text-overflow:ellipsis;" title="<?php echo $destination['from_address']['city']; ?>"><b><?php echo $destination['from_address']['city']; ?></b></div>
+                                                                    </div>
+
                                                                     <div class="flex-fill">
                                                                         <small>Zip Code</small> <br>
                                                                         <b><?php echo $destination['from_address']['zip_code']; ?></b>
@@ -423,7 +436,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12 col-md-8 border-left">
+                                                        <div class="col-12 col-md-7 border-left">
                                                             <div class="mb-2"><small>Delivery Locations</small></div>
                                                             <div class="mb-2">
                                                                 <div class="d-flex">

@@ -6,7 +6,7 @@ use Exception;
 
 trait SLSR_WcShipvistaFunctions
 {
-  public $registeredCarriers = ['CanadaPost', 'UPS', 'CANPAR'];
+  public $registeredCarriers = ['CanadaPost', 'UPS', 'CANPAR', 'USPS'];
   private $baseApiUrl = 'https://api.shipvista.com/api/';
   public $apiHttpErrorCode;
   public $errorLogKeys = ['Authentication'];
@@ -19,6 +19,10 @@ trait SLSR_WcShipvistaFunctions
     'UPS' => [
       'name' => 'UPS',
       'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/ups_logo.png'
+    ],
+    'USPS' => [
+      'name' => 'USPS',
+      'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/usps_logo.png'
     ],
     'CANPAR' => [
       'name' => 'CANPAR',
@@ -140,6 +144,7 @@ trait SLSR_WcShipvistaFunctions
             'postalCode' =>   $addressData['zip_code'],
             'countryCode' => $addressData['country'],
             'stateCode' => $addressData['state'],
+            'city' => (isset($addressData['city']) ? $addressData['city'] : ''),
             'residential' => true
           ];
         }

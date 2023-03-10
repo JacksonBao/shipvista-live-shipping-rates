@@ -38,6 +38,10 @@ $carriersLogo = [
     'canpar' => [
       'name' => 'CANPAR',
       'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/canpar_logo.png'
+    ],
+    'usps' => [
+      'name' => 'USPS',
+      'image' => SHIPVISTA__PLUGIN_URL . 'assets/img/usps_logo.png'
     ]
     ];
 

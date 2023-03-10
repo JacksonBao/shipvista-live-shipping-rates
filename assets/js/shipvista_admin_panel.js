@@ -28,7 +28,6 @@ function removeShippingMethod(id) {
                     form = JSON.parse(form);
                     form.splice(id, 1);
                     _id(idAppend + 'shipvista_custom_shipping_method').value = JSON.stringify(form);
-                    console.log(form);
                     setTimeout(() => {
                         sv_WooSave();
                     }, 500);
@@ -40,7 +39,7 @@ function removeShippingMethod(id) {
                 alertBar('Could not find shipping method');
             }
         }
-    } else {
+    } else { 
         alertBar("Could not find shipping method to delete.");
     }
 }
@@ -79,7 +78,6 @@ function addShippingMethod() {
             shippingRates.push(shippingObject);
             // stringyfy object
             _id(idAppend + 'shipvista_custom_shipping_method').value = JSON.stringify(shippingRates);
-            console.log(_id(idAppend + 'shipvista_custom_shipping_method').value)
             sv_WooSave();
 
         } else {
@@ -135,7 +133,6 @@ window.addEventListener('load', evt => {
                         country,
                     },
                     (response) => {
-                        console.log(response);
                         if (response.status) {
                             _id('from_state').disabled = false;
                             // set states
@@ -218,7 +215,7 @@ function editLocation(id) {
             try {
                 form = JSON.parse(form);
                 setOptionSelected('from_country', form.from_address.country);
-                _id('_nickname').value = form.nickname;  
+                _id('_nickname').value = form.nickname;
 
                 // Create a new 'change' event
                 var event = new Event('change');
@@ -227,11 +224,11 @@ function editLocation(id) {
                 setTimeout(() => {
                     setOptionSelected('from_state', form.from_address.state);
                 }, 1000);
+                _id('from_city').value = form.from_address.city;
                 _id('from_zip_code').value = form.from_address.zip_code;
 
                 var countriesTo = form.to_address.country || [];
 
-                console.log(countriesTo, form)
                 setTimeout(() => {
                     setOptionSelected('to_country', countriesTo, 1);
                 }, 1000);
@@ -255,7 +252,6 @@ function editLocation(id) {
                 isAddrebookUpdate = id - 1;
 
             } catch (e) {
-                console.log(form, e)
                 alertBar('Could not load location data');
             }
         } else {
@@ -298,18 +294,20 @@ function sv_saveAddressBook() {
     var f_country = (_id('from_country').value).replace(/[^a-zA-Z]/gi, '');
     var f_state = (_id('from_state').value).replace(/[^a-zA-Z]/gi, '');
     var f_zip = (_id('from_zip_code').value).replace(/[^a-zA-Z0-9]/gi, '');
+    var f_city = (_id('from_city').value).replace(/[^a-zA-Z0-9 ]/gi, '');
     var nickName = (_id('_nickname').value).replace(/[^a-zA-Z0-9\_\.\- ]/gi, '');
     if (f_country.length == 2) {
         if (f_state.length >= 2) {
-            if (f_zip.length > 4) {
-                var address = getInput('shipvista_address_book');
-                try {
-                    address = JSON.parse(address);
-                } catch (e) {
-                    address = [];
-                }
-                var to_country = jQuery('#to_country').val();
-                // if (to_country.length > 0) {
+            if (f_city.length >= 3) {
+                if (f_zip.length > 4) {
+                    var address = getInput('shipvista_address_book');
+                    try {
+                        address = JSON.parse(address);
+                    } catch (e) {
+                        address = [];
+                    }
+                    var to_country = jQuery('#to_country').val();
+                    // if (to_country.length > 0) {
                     var stateList = {};
                     var states = jQuery('#to_state').val().map(x => {
                         var state = x.replace(/[^a-zA-Z\.]/gi, '');
@@ -323,13 +321,13 @@ function sv_saveAddressBook() {
                         }
 
                     });
-                    console.log(to_country)
                     const object = {
-                        nickname : nickName,
+                        nickname: nickName,
                         from_address: {
                             country: f_country,
                             state: f_state,
-                            zip_code: f_zip
+                            zip_code: f_zip,
+                            city: f_city
                         },
                         to_address: {
                             country: to_country,
@@ -349,11 +347,14 @@ function sv_saveAddressBook() {
                     _id(idAppend + 'shipvista_address_book').value = addressString;
                     // save form
                     sv_WooSave();
-                // } else {
-                //     alertBar('Select at least delivery country');
-                // }
+                    // } else {
+                    //     alertBar('Select at least delivery country');
+                    // }
+                } else {
+                    alertBar('Enter a valid zip code');
+                }
             } else {
-                alertBar('Enter a valid zip code');
+                alertBar('Enter a valid city. At least 3 characters.');
             }
         } else {
             alertBar('Enter valid state code. Only two characters.')
@@ -471,7 +472,6 @@ function svApiCall(content, endPoint, meth, callback) {
         },
         success: function (data, textStatus, xhr) {
             if (xhr.status == 200 || xhr.status == 'success') {
-                console.log(data)
                 if (Object.keys(data).indexOf('status') >= 0) {
                     result = data;
                 } else if (Object.keys(data).indexOf('response') >= 0) {
@@ -520,7 +520,7 @@ function svApiCall(content, endPoint, meth, callback) {
 function shipvista_ConnectStore(callback = false) {
     if (callback != false) {
         result = callback;
-        if (result.status == true) {
+        if (result.status == true || result?.access_token?.tokenString) {
             alertBar('Login successfull', 'bg-success');
             // set form data
             jQuery('#' + idAppend + 'shipvista_api_token').val(result.access_token.tokenString);
@@ -617,7 +617,6 @@ function shipvista_toggleCarrieSubs(carrier, act) {
     if (!carrier) return false;
 
     var options = document.getElementsByClassName(carrier + '_options');
-    console.log(carrier + '_options')
     if (options.length > 0) {
         for (let index = 0; index < options.length; index++) {
             const parent = options[index];

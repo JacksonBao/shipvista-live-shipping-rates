@@ -68,3 +68,7 @@
 
 == 3.0.8 ==
 * Update Canpar delivery date
+
+== 3.0.9 ==
+* Add USPS Carrier rates
+* Add city to warehouse location

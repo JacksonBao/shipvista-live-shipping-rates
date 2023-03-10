@@ -91,6 +91,18 @@ trait SLSR_WcShipvistaForms
                 'class' => 'form-control mb-3 form-control-sm',
                 'desc_tip'    => true,
             ),
+            'USPS' => array(
+                'title' => __('Default Carrier', 'shipvista'),
+                'type'        => 'hidden',
+                'class' => 'form-control mb-3 form-control-sm',
+                'desc_tip'    => true,
+            ),
+            'USPS_enabled' => array(
+                'title' => __('Enable USPS Post', 'shipvista'),
+                'type'        => 'hidden',
+                'class' => 'form-control mb-3 form-control-sm',
+                'desc_tip'    => true,
+            ),
         );
     }
 

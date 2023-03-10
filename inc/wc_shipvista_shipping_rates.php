@@ -400,7 +400,17 @@ trait SLSR_WcShipvistaRates
 
     public function calculateTransitTime( $service )
     {
+        $expectedSplit = explode('-', $service['expectedTransitTime']);
+        if(count($expectedSplit) > 1){
+            $service['expectedTransitTime'] = (int) $expectedSplit[1];
+        }
         $expected = (int) $service['expectedTransitTime'];
+        if(!$service['expectedTransitTime'] && isset($service['dayOfWeek'])){
+            $service['expectedDeliveryDate'] = date('Y-m-d', strtotime("next " . $service['dayOfWeek'] )) . 'T00:00:00';
+            $expected = 0;
+        }
+
+        
         if($expected < 1) {
             if(isset($service['expectedDeliveryDate'])){
                 $split = explode('t', strtolower($service['expectedDeliveryDate']))[0];

@@ -223,5 +223,256 @@
       "carrier_code": "I",
       "carrier_option": "INTERNATIONAL"
     }
+  ],
+  "USPS" : [
+    {
+      "carrier": "USPS",
+      "carrier_code": "0",
+      "carrier_option": "FIRST-CLASS PACKAGE SERVICE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "0",
+      "carrier_option": "FIRST-CLASS PACKAGE SERVICE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "0",
+      "carrier_option": "FIRST-CLASS PACKAGE RETURN SERVICE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "USPS_FCM_LE",
+      "carrier_option": "FIRST CLASS MAIL LARGE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "2",
+      "carrier_option": "PRIORITY MAIL EXPRESS HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "3",
+      "carrier_option": "Priority Mail Express®"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "13",
+      "carrier_option": "Priority Mail Express® Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "23",
+      "carrier_option": "PRIORITY MAIL EXPRESS SUNDAY/HOLIDAY DELIVERY"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "32",
+      "carrier_option": "PRIORITY MAIL EXPRESS SUNDAY/HOLIDAY DELIVERY FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "63",
+      "carrier_option": "PRIORITY MAIL EXPRESS FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "30",
+      "carrier_option": "Priority Mail Express® Legal Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "31",
+      "carrier_option": "PRIORITY MAIL EXPRESS LEGAL FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "64",
+      "carrier_option": "PRIORITY MAIL EXPRESS SUNDAY/HOLIDAY DELIVERY LEGAL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "55",
+      "carrier_option": "PRIORITY MAIL EXPRESS FLAT RATE BOXES"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "56",
+      "carrier_option": "PRIORITY MAIL EXPRESS FLAT RATE BOXES HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "57",
+      "carrier_option": "PRIORITY MAIL EXPRESS SUNDAY/HOLIDAY DELIVERY FLAT RATE BOXES"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "62",
+      "carrier_option": "Priority Mail Express® Padded Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "63",
+      "carrier_option": "PRIORITY MAIL EXPRESS PADDED FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "64",
+      "carrier_option": "PRIORITY MAIL EXPRESS SUNDAY/HOLIDAY DELIVERY PADDED FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "1",
+      "carrier_option": "Priority Mail® "
+    },{
+      "carrier": "USPS",
+      "carrier_code": "17",
+      "carrier_option": "PRIORITY MAIL MEDIUM FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "22",
+      "carrier_option": "Priority Mail® Large Flat Rate Box"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "35",
+      "carrier_option": "PRIORITY MAIL MEDIUM FLAT RATE BOX HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "28",
+      "carrier_option": "Priority Mail® Small Flat Rate Box"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "36",
+      "carrier_option": "PRIORITY MAIL SMALL FLAT RATE BOX HOLD FOR PICKUP,"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "38",
+      "carrier_option": "Priority Mail® Gift Card Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "39",
+      "carrier_option": "PRIORITY MAIL GIFT CARD FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "40",
+      "carrier_option": "Priority Mail® Window Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "41",
+      "carrier_option": "PRIORITY MAIL WINDOW FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "42",
+      "carrier_option": "Priority Mail® Small Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "43",
+      "carrier_option": "PRIORITY MAIL SMALL FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "44",
+      "carrier_option": "Priority Mail® Legal Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "29",
+      "carrier_option": "Priority Mail® Padded Flat Rate Envelope"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "45",
+      "carrier_option": "PRIORITY MAIL LEGAL FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "46",
+      "carrier_option": "PRIORITY MAIL PADDED FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "16",
+      "carrier_option": "PRIORITY MAIL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "37",
+      "carrier_option": "PRIORITY MAIL FLAT RATE ENVELOPE HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "922",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE PADDED FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "922",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE GIFT CARD FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "934",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE WINDOW FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "936",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE SMALL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "938",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE LEGAL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "939",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "962",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "963",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE LARGE FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "17",
+      "carrier_option": "Priority Mail® Medium Flat Rate Box"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "965",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE SMALL FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "967",
+      "carrier_option": "PRIORITY MAIL RETURN SERVICE CUBIC"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "84",
+      "carrier_option": "Priority Mail® Cubic"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "77",
+      "carrier_option": "Parcel Select Ground™"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "2071",
+      "carrier_option": "PARCEL SELECT GROUND HOLD FOR PICKUP"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "92",
+      "carrier_option": "Parcel Select Ground™ Cubic"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "1",
+      "carrier_option": "PRIORITY MAIL EXPRESS INTERNATIONAL"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "10",
+      "carrier_option": "PRIORITY MAIL EXPRESS INTERNATIONAL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "2",
+      "carrier_option": "PRIORITY MAIL INTERNATIONAL"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "8",
+      "carrier_option": "PRIORITY MAIL INTERNATIONAL FLAT RATE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "9",
+      "carrier_option": "PRIORITY MAIL INTERNATIONAL MEDIUM FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "16",
+      "carrier_option": "PRIORITY MAIL INTERNATIONAL SMALL FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "11",
+      "carrier_option": "PRIORITY MAIL INTERNATIONAL LARGE FLAT RATE BOX"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "13",
+      "carrier_option": "FIRST-CLASS MAIL INTERNATIONAL LETTER"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "14",
+      "carrier_option": "FIRST-CLASS MAIL INTERNATIONAL LARGE ENVELOPE"
+    },{
+      "carrier": "USPS",
+      "carrier_code": "15",
+      "carrier_option": "FIRST-CLASS PACKAGE INTERNATIONAL SERVICE"
+    }
   ]
 }
